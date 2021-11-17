@@ -5,6 +5,7 @@
 #include "tools/ft_strlen.c"
 #include "tools/my_atoi.c"
 #include "tools/my_itoa.c"
+#include <limits.h>
 
 void ft_printf(const char *format, ...)
 {
@@ -75,76 +76,108 @@ void ft_printf(const char *format, ...)
 
             if (format[i] == 'i' || format[i] == 'd')
             {
-                char *str = my_itoa(va_arg(args, int));
-                output = str;
-                if (plusFlag == 1 && my_atoi(output) > 0)
+                long long numb = va_arg(args, int);
+                int lenght = 0;
+
+                if (spaceFlag == 1 && numb >= 0)
                 {
-                    write(STDOUT_FILENO, "+", 1);
+                    lenght++;
+                    write(STDOUT_FILENO, " ", 1);
+                }
+
+                if (zeroFlag == 0)
+                {
+                    if (plusFlag == 1)
+                    {
+                        if (numb < 0)
+                        {
+                            lenght++;
+                        }
+                        else if (plusFlag == 1 && numb > 0)
+                        {
+
+                            lenght++;
+                        }
+                    }
+
+                    char *str = my_itoa(numb);
+                    output = str;
+                    lenght += ft_strlen(output);
+                    while (width - lenght > 0)
+                    {
+                        write(STDOUT_FILENO, " ", 1);
+                        width--;
+                    }
+                    if (plusFlag == 1 && numb >= 0)
+                    {
+                        write(STDOUT_FILENO, "+", 1);
+                    }
+                }
+                else if (zeroFlag == 1)
+                {
+                    if (numb < 0)
+                    {
+                        write(STDOUT_FILENO, "-", 1);
+                        numb *= -1;
+                        lenght++;
+                    }
+                    else if (plusFlag == 1 && numb >= 0)
+                    {
+                        write(STDOUT_FILENO, "+", 1);
+                        lenght++;
+                    }
+                    char *str = my_itoa(numb);
+                    output = str;
+                    lenght += ft_strlen(output);
+                    while (width - lenght > 0)
+                    {
+                        write(STDOUT_FILENO, "0", 1);
+                        width--;
+                    }
                 }
             }
             else if (format[i] == 'c')
             {
-                zeroFlag = 0;
-                char str = va_arg(args, int);
-                char *pStr = &str;
-                int sLen = ft_strlen(pStr);
-
-                if (width <= sLen)
+                output = (char *)malloc(2 * sizeof(char));
+                output[0] = va_arg(args, int);
+                output[1] = '\0';
+                int lenght = ft_strlen(output);
+                while (width - lenght > 0)
                 {
-                    output = "c";
-                }
-                else
-                {
-                    char *newStr = (char *)malloc(sizeof(char) * (width + 1));
-                    newStr[width] = '\0';
-
-                    if (minusFlag == 1)
-                    {
-                        for (int j = sLen; j < width; j++)
-                        {
-                            newStr[i] = ' ';
-                        }
-
-                        for (int j = 0; j < sLen; j++)
-                        {
-                            newStr[i] = pStr[i];
-                        }
-                    }
-                    else
-                    {
-                        int start = width - sLen;
-
-                        for (int j = 0; j < start; j++)
-                        {
-                            newStr[i] = ' ';
-                        }
-
-                        for (int j = start; j < width; j++)
-                        {
-                            newStr[i] = pStr[j - start];
-                        }
-                    }
-                    output = newStr;
+                    write(STDOUT_FILENO, " ", 1);
+                    width--;
                 }
             }
             else if (format[i] == 's')
             {
+                output = va_arg(args, char *);
+                if (output == NULL)
+                {
+                    output = "(null)";
+                }
+                int lenght = ft_strlen(output);
+
                 if (zeroFlag == 0)
                 {
-                    while (width != 0)
+                    while (width - lenght > 0)
                     {
                         write(STDOUT_FILENO, " ", 1);
                         width--;
                     }
                 }
-
-                output = va_arg(args, char *);
+                else if (zeroFlag == 1)
+                {
+                    while (width - lenght > 0)
+                    {
+                        write(STDOUT_FILENO, "0", 1);
+                        width--;
+                    }
+                }
             }
             else if (format[i] == '%')
             {
                 output = "%";
             }
-            // printf("%s   \n", output);
 
             write(STDOUT_FILENO, output, ft_strlen(output));
         }
@@ -154,7 +187,6 @@ void ft_printf(const char *format, ...)
 // int main()
 // {
 
-//     // printf("2 --- %s\n", ft_printf("qwer"));
-
-//     ft_printf("qwer%d", 42);
+//     printf("%i\n", INT_MIN);
+//     ft_printf("%d", -2147483648);
 // }

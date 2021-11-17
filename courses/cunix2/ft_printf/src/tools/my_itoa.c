@@ -1,7 +1,7 @@
 #include "../../include/ft_printf.h"
 #include <stdlib.h>
 
-char *my_itoa(int nmb)
+char *my_itoa(long long int nmb)
 {
 
     char *result = malloc(sizeof(char) * 32);
@@ -13,7 +13,6 @@ char *my_itoa(int nmb)
         return result;
     }
 
-    
     int r = 0;
     int dublicateN = nmb;
     while (dublicateN != 0)
@@ -31,16 +30,16 @@ char *my_itoa(int nmb)
         {
             result[i] = '0' + nmb % 10;
             nmb /= 10;
-        }  
-    } 
-    else 
+        }
+    }
+    else
     {
         result[r] = '\0';
         for (int i = r - 1; i >= 0; i--)
         {
             result[i] = '0' + nmb % 10;
             nmb /= 10;
-        }  
+        }
     }
     return result;
 }
